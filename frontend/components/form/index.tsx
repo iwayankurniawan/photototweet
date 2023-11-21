@@ -12,7 +12,7 @@ const AddDataForm: React.FC<{
 }> = ({
 
 }) => {
-        const [formData, setFormData] = useState<UserForm>({image:[]})
+        const [formData, setFormData] = useState<UserForm>({ image: [] })
 
         let validationSchema = Yup.object().shape({
             image: Yup.mixed<File[]>().required('Image is required').test('fileSize', 'File size is too large', (value: any) => value && value[0].size <= 500000000),
@@ -88,8 +88,15 @@ const AddDataForm: React.FC<{
                             <div>
                                 {formData.image.map((item, index) => (
                                     <div key={"divupload" + index} style={{ display: "flex", alignItems: "center", marginBottom: "6px" }}>
-                                        <button key={"buttonupload" + index} onClick={() => removeItem(index)} className="btn icon-btn warning"><i className="icon icon-cross"></i></button>
+                                        <img
+                                            src={URL.createObjectURL(formData.image[index])}
+                                            alt={formData.image[index].name}
+                                            className="max-w-xs max-h-48"
+                                        />
                                         <p key={"pupload" + index} style={{ margin: "0px", marginLeft: "4px" }}>{formData.image[index].name}</p>
+                                        <button key={"buttonupload" + index} onClick={() => removeItem(index)} type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
+                                            Delete
+                                        </button>
                                     </div>
                                 ))}
                             </div>
