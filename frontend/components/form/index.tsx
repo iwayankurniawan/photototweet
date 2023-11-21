@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 
 interface UserForm {
-    image: FileList;
+    image: File[];
 }
 
 const AddDataForm: React.FC<{
@@ -12,10 +12,10 @@ const AddDataForm: React.FC<{
 }> = ({
 
 }) => {
-        const [formData, setFormData] = useState<UserForm>()
+        const [formData, setFormData] = useState<UserForm>({image:[]})
 
         let validationSchema = Yup.object().shape({
-            image: Yup.mixed<FileList>().required('Image is required').test('fileSize', 'File size is too large', (value: any) => value && value[0].size <= 500000000),
+            image: Yup.mixed<File[]>().required('Image is required').test('fileSize', 'File size is too large', (value: any) => value && value[0].size <= 500000000),
         });
 
         const {
@@ -24,17 +24,37 @@ const AddDataForm: React.FC<{
             formState: { errors }
         } = useForm<UserForm>({
             resolver: yupResolver(validationSchema),
-            
+
         });
 
-        const handleInputChange = (e:ChangeEvent<HTMLInputElement>) => {
-            // You can perform additional actions on input change if needed
-            console.log(e.target)
-            console.log('Input changed:', e.target.files);
-            setFormData((previous_element) =>({
-                ...previous_element, {"image": e.target.files} 
+        const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+            if (!event.target.files) return;
+
+            const chosenFiles = Array.prototype.slice.call(event.target.files)
+            const uploaded = formData.image
+
+            chosenFiles.some((file) => {
+                if (uploaded.findIndex((f: File) => f.name === file.name) === -1) {
+                    uploaded.push(file)
+                }
+            })
+
+            setFormData((prevListUpload: UserForm) => ({
+                ...prevListUpload,
+                image: Array.from(uploaded),
             }))
         };
+
+        const removeItem = (indexToRemove: number) => {
+            let updatedItems: File[]
+
+            updatedItems = [...formData.image.slice(0, indexToRemove), ...formData.image.slice(indexToRemove + 1)];
+            setFormData((prevListUpload) => ({
+                ...prevListUpload,
+                image: updatedItems,
+            }))
+
+        }
 
         const onSubmit = (data: UserForm) => {
             console.log(data)
@@ -66,7 +86,12 @@ const AddDataForm: React.FC<{
                             </div>
 
                             <div>
-
+                                {formData.image.map((item, index) => (
+                                    <div key={"divupload" + index} style={{ display: "flex", alignItems: "center", marginBottom: "6px" }}>
+                                        <button key={"buttonupload" + index} onClick={() => removeItem(index)} className="btn icon-btn warning"><i className="icon icon-cross"></i></button>
+                                        <p key={"pupload" + index} style={{ margin: "0px", marginLeft: "4px" }}>{formData.image[index].name}</p>
+                                    </div>
+                                ))}
                             </div>
 
                             <div className="flex items-center justify-between">
