@@ -2,10 +2,8 @@ import { useState, useEffect, ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-
-interface UserForm {
-    image: File[];
-}
+import { UserForm } from '../type';
+import { submitData } from './formapi';
 
 const AddDataForm: React.FC<{
 
@@ -59,6 +57,7 @@ const AddDataForm: React.FC<{
         const onSubmit = (data: UserForm) => {
             console.log(data)
             setFormData(data)
+            submitData(data)
         };
 
         return (
