@@ -1,18 +1,15 @@
 import { UserForm } from "../type";
 const URL = "http://localhost:5000"
 
-export async function submitData(data: UserForm) {
+export async function submitData(formData: FormData) {
     try {
-        const response = await fetch(URL + '/submit', {
+        const response = await fetch(URL + '/upload', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
+            body: formData,
         });
 
         const result = await response.json();
-        console.log(result);
+        return result
     } catch (error) {
         console.error('Error posting data:', error);
     }

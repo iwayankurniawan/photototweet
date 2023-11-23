@@ -4,6 +4,12 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { UserForm } from '../type';
 import { submitData } from './formapi';
+import { encodeImageAsText } from './utils';
+
+type resultType = {
+    name: string,
+    base64: string
+}
 
 const AddDataForm: React.FC<{
 
@@ -11,6 +17,8 @@ const AddDataForm: React.FC<{
 
 }) => {
         const [formData, setFormData] = useState<UserForm>({ image: [] })
+        const [result, setResult] = useState<any[]>([])
+        const [showLoading, setShowLoading] = useState<boolean>(false)
 
         let validationSchema = Yup.object().shape({
             image: Yup.mixed<File[]>().required('Image is required').test('fileSize', 'File size is too large', (value: any) => value && value[0].size <= 500000000),
@@ -19,7 +27,8 @@ const AddDataForm: React.FC<{
         const {
             register,
             handleSubmit,
-            formState: { errors }
+            formState: { errors },
+            reset
         } = useForm<UserForm>({
             resolver: yupResolver(validationSchema),
 
@@ -54,10 +63,24 @@ const AddDataForm: React.FC<{
 
         }
 
-        const onSubmit = (data: UserForm) => {
-            console.log(data)
-            setFormData(data)
-            submitData(data)
+        const onSubmit = async (data: UserForm) => {
+            setShowLoading(true)
+            const sendFormData = new FormData();
+            for (const file of data.image) {
+                const enhancedFile = new File([file], file.name, {
+                    type: file.type,
+                    lastModified: file.lastModified,
+                });
+
+                sendFormData.append('images', enhancedFile);
+            }
+            setFormData({ image: [] })
+            const response = await submitData(sendFormData)
+            setShowLoading(false)
+            console.log("response")
+            console.log(response)
+            setResult(response.results)
+            reset()
         };
 
         return (
@@ -85,6 +108,7 @@ const AddDataForm: React.FC<{
                             </div>
 
                             <div>
+
                                 {formData.image.map((item, index) => (
                                     <div key={"divupload" + index} style={{ display: "flex", alignItems: "center", marginBottom: "6px" }}>
                                         <img
@@ -100,10 +124,20 @@ const AddDataForm: React.FC<{
                                 ))}
                             </div>
 
+                            {showLoading ? <p>Loading</p> : ""}
+
                             <div className="flex items-center justify-between">
                                 <input className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600" type="submit" />
                             </div>
                         </form>
+
+                        {
+                            result.length !== 0 &&
+                            result.map((item) => <>
+                                <p>{item.name}</p>
+                                <p>{item.text}</p>
+                            </>)
+                        }
                     </div>
                 </div>
             </>
