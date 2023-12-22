@@ -3,8 +3,9 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { UserForm } from '../type';
-import { submitData } from './formapi';
-import { encodeImageAsText } from './utils';
+import { uploadData, getPresignedUrl } from './formapi';
+import { useRouter } from 'next/router';
+import { sendMultipleRequests } from './utils';
 
 type resultType = {
     name: string,
@@ -19,6 +20,7 @@ const AddDataForm: React.FC<{
         const [formData, setFormData] = useState<UserForm>({ image: [] })
         const [result, setResult] = useState<any[]>([])
         const [showLoading, setShowLoading] = useState<boolean>(false)
+        const router = useRouter();
 
         let validationSchema = Yup.object().shape({
             image: Yup.mixed<File[]>().required('Image is required').test('fileSize', 'File size is too large', (value: any) => value && value[0].size <= 500000000),
@@ -50,6 +52,7 @@ const AddDataForm: React.FC<{
                 ...prevListUpload,
                 image: Array.from(uploaded),
             }))
+            console.log(formData)
         };
 
         const removeItem = (indexToRemove: number) => {
@@ -65,22 +68,31 @@ const AddDataForm: React.FC<{
 
         const onSubmit = async (data: UserForm) => {
             setShowLoading(true)
-            const sendFormData = new FormData();
-            for (const file of data.image) {
-                const enhancedFile = new File([file], file.name, {
-                    type: file.type,
-                    lastModified: file.lastModified,
-                });
-
-                sendFormData.append('images', enhancedFile);
-            }
+            const sendFormData = [...data.image]
             setFormData({ image: [] })
-            const response = await submitData(sendFormData)
-            setShowLoading(false)
-            console.log("response")
-            console.log(response)
-            setResult(response.results)
-            reset()
+
+            //const presignedUrl = await getPresignedUrl()
+            const filenameList = await sendMultipleRequests(sendFormData)
+            console.log(filenameList)
+            const promises = filenameList?.map((item_name: string) => uploadData(item_name));
+            if (promises) {
+                const results = await Promise.all(promises);
+                setShowLoading(false)
+                console.log(sendFormData)
+                console.log(results)
+
+                const combinedArray = results.map((item) => {
+                    const matchingFilename = Array.from(sendFormData).find(filename => item?.filename.includes(filename.name));
+                    return {
+                        text: item?.text,
+                        file: matchingFilename
+                    };
+                })
+
+                setResult(combinedArray)
+            }
+            //router.push('/result');
+            //reset()
         };
 
         return (
@@ -133,10 +145,17 @@ const AddDataForm: React.FC<{
 
                         {
                             result.length !== 0 &&
-                            result.map((item) => <>
-                                <p>{item.name}</p>
-                                <p>{item.text}</p>
-                            </>)
+                            result.map((item) => (
+                                <>
+                                    <img
+                                        src={URL.createObjectURL(item.file)}
+                                        alt={item.file.name}
+                                        className="max-w-xs max-h-48"
+                                    />
+                                    <p>{item.file.name}</p>
+                                    <p style={{whiteSpace:"pre-line"}}>{item.text}</p>
+                                </>)
+                            )
                         }
                     </div>
                 </div>
