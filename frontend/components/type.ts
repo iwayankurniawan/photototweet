@@ -7,6 +7,10 @@ export interface ApiInput {
     filename: string | string[]
 }
 
+export interface ResultViewType{
+    text?: string,
+    file: File
+}
 
 
 

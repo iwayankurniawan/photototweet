@@ -9,10 +9,6 @@ const Result: NextPage = () => {
       <Head>
         <title>Result</title>
       </Head>
-      <div className='bg-white min-h-screen'>
-        <FormResult/>
-      </div>
-      
     </>
   )
 }

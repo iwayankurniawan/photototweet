@@ -33,7 +33,7 @@ export async function uploadData(filename: string){
 
         const result = await response.json();
         const final_result = JSON.parse(result.body)
-        return {"text": final_result.result, "filename":filename}
+        return {"text": final_result.result as string, "filename":filename}
     } catch (error) {
         console.error('Error posting data:', error);
     }
