@@ -7,8 +7,7 @@ import traceback
 
 def lambda_handler(event, context):
     try:
-        print(event)
-        event_body = event
+        event_body = json.loads(event["body"])
         s3 = boto3.client('s3')
 
         # Generate a random S3 key name
@@ -22,7 +21,7 @@ def lambda_handler(event, context):
             ExpiresIn=60,
         )
         
-        
+        print(presigned_url)
         # Return the presigned URL
         return {
             "statusCode": 200,

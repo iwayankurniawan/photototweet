@@ -37,13 +37,13 @@ const AddDataForm: React.FC<{
         }
 
         const onSubmit = async (data: UserForm) => {
-            console.log("masuk")
             setShowLoading(true)
             const sendFormData = [...data.image]
             setFormData({ image: [] })
-
+        
             //const presignedUrl = await getPresignedUrl()
             const filenameList = await sendMultipleRequests(sendFormData)
+            
             const promises = filenameList?.map((item_name: string) => uploadData(item_name));
             if (promises) {
                 const results = await Promise.all(promises);

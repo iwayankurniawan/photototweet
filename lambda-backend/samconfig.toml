@@ -20,8 +20,8 @@ resolve_s3 = true
 s3_prefix = "lambda-backend"
 region = "us-west-1"
 disable_rollback = true
-parameter_overrides = "S3Storage=\"phototweet-image-bucket\""
 image_repositories = []
+parameter_overrides = "S3Storage=\"pictocontent-image\" DynamodbImageTable=\"image-table\""
 
 [default.package.parameters]
 resolve_s3 = true

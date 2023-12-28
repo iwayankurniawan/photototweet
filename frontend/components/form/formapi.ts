@@ -14,7 +14,8 @@ export async function getPresignedUrl(file: File) {
         });
 
         const result = await response.json();
-        return JSON.parse(result.body)
+        
+        return result
     } catch (error) {
         console.error('Error posting data:', error);
     }
@@ -25,14 +26,15 @@ export async function uploadData(filename: string){
         const data:ApiInput = {
             "filename": filename
         }
-
+        
         const response = await fetch(URL + '/api/upload-image', {
             method: 'POST',
             body: JSON.stringify(data)
         });
 
         const result = await response.json();
-        const final_result = JSON.parse(result.body)
+        
+        const final_result = result
         return {"text": final_result.result as string, "filename":filename}
     } catch (error) {
         console.error('Error posting data:', error);

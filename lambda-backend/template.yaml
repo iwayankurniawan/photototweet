@@ -16,6 +16,7 @@ Globals:
     Environment:
       Variables:
         S3_STORAGE: !Ref S3Storage
+        DYNAMODB_IMAGE_TABLE: !Ref DynamodbImageTable
 
     Tracing: Active
     # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
@@ -27,9 +28,18 @@ Globals:
 Parameters:
   S3Storage:
     Type: String
-    Default: phototweet-image-bucket
+    Default: pictocontent-image
+  
+  DynamodbImageTable:
+    Type: String
+    Default: image-table
 
 Resources:
+  RestApiBackend:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: uat
+
 #Add Create Presigned URL Role and Function
   CreatePresignedUrlRole:
     Type: AWS::IAM::Role
@@ -79,6 +89,14 @@ Resources:
       CodeUri: functions/create_presigned_url/
       Description: 'Function to create presigned url, send url to frontend to make front able to upload a file'
       Role: !GetAtt CreatePresignedUrlRole.Arn
+      Events:
+        CreatePresignedUrlApi:
+          Type: Api
+          Properties:
+            Path: /v1/api/create-upload-token
+            Method: post
+            RestApiId:
+              Ref: RestApiBackend
 
 
 
@@ -106,6 +124,15 @@ Resources:
                 Resource: 
                   - !Sub "arn:aws:s3:::${S3Storage}"
                   - !Sub "arn:aws:s3:::${S3Storage}/*"
+        - PolicyName: dynamodb-put-update-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                Resource: !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DynamodbImageTable}"
         - PolicyName: secretmanager-getvalue-policy
           PolicyDocument:
             Version: "2012-10-17"
@@ -137,8 +164,33 @@ Resources:
       CodeUri: functions/call_open_ai/
       Description: 'Function to call open ai api'
       Role: !GetAtt CallOpenAIFunctionRole.Arn
+      Events:
+        CallOpenAIApi:
+          Type: Api
+          Properties:
+            Path: /v1/api/upload-image
+            Method: post
+            RestApiId:
+              Ref: RestApiBackend
+#Dynamo DB Image Table Initialization
+  ImageDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref DynamodbImageTable
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
 
-
+  ImageS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3Storage
 
 #Application Resource Group 
   ApplicationResourceGroup:
