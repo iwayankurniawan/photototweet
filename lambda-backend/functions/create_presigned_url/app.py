@@ -4,6 +4,7 @@ import time
 import json
 import os
 import traceback
+import uuid
 
 def lambda_handler(event, context):
     try:
@@ -11,13 +12,13 @@ def lambda_handler(event, context):
         s3 = boto3.client('s3')
 
         # Generate a random S3 key name
-        new_filename = event_body["uniqueId"]+"/"+event_body["filename"]
-        final_filename = new_filename.replace(" ", "-")
+        final_filename = str(uuid.uuid4())+"_"+event_body["filename"]
+        # final_filename = new_filename.replace(" ", "-")
         # Generate the presigned URL for put requests
         
         presigned_url = s3.generate_presigned_post(
             Bucket= os.environ["S3_STORAGE"],
-            Key=final_filename,
+            Key=event_body["uniqueId"]+"/"+final_filename,
             ExpiresIn=60,
         )
         

@@ -5,6 +5,7 @@ import time
 import json
 import os
 from openai import OpenAI
+from datetime import datetime
 import base64
 import traceback
 
@@ -24,17 +25,23 @@ def lambda_handler(event, context):
         # get information from user
         event_body = json.loads(event["body"])
         filename = event_body["filename"]
+        user_id = event_body["uniqueId"]
+        s3_folder = user_id + "/" + filename
 
         # Main Function start in here
-        base64_image = get_s3_image_as_base64(s3, bucket_name, filename)
+        base64_image = get_s3_image_as_base64(s3, bucket_name, s3_folder)
         result_vision = openai_vision(openai_client, base64_image)
         result = openai_gpt(openai_client, result_vision)
 
         client = boto3.resource("dynamodb")
         image_table = client.Table(os.environ["DYNAMODB_IMAGE_TABLE"])
+        timestamp = datetime.utcnow().isoformat()
         image_table.put_item(Item={
-            'id': "test12",
-            'filename': filename,  # Example numeric attribute
+            'id': "USER#" + user_id,
+            'user_id': user_id,
+            'filename': filename,  
+            'datetime': timestamp,
+            'result': result
             # Add other attributes as needed
         })
 

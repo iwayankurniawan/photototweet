@@ -2,10 +2,13 @@ import { ReactNode } from 'react';
 import { ResultViewType } from '../type';
 
 const FormResult: React.FC<{
-    item: ResultViewType,
+    imgSrc: string
+    fileName: string
+    text?: string
     children?: ReactNode
+    date?:string
 }> = ({
-    item, children
+    imgSrc, fileName, text, children, date
 }) => {
         return (
             <>
@@ -13,22 +16,26 @@ const FormResult: React.FC<{
                     <div className="w-[22rem] rounded-lg shadow transition hover:shadow-lg flex flex-col">
                         <div className="w-full h-52 overflow-hidden">
                             <img
-                                src={URL.createObjectURL(item.file)}
-                                alt={item.file.name}
+                                src={imgSrc}
+                                alt={fileName}
                                 className="w-full h-full object-cover"
                             />
                         </div>
 
                         <div className="bg-white p-1 sm:p-3 h-auto">
                             <div className='pl-2'>
-                                <h3 className="font-bold pb-2 line-clamp-2 text-lg text-gray-900">
-                                    {item.file.name}
+                                <h3 className="font-bold line-clamp-1 text-lg text-gray-900">
+                                    {fileName}
                                 </h3>
+                                {
+                                    date && <p className='pb-2'><i>{date}</i></p>
+                                }
+                                
 
-                                {item.text &&
+                                {text &&
                                     <div className='overflow-auto'>
                                         <p className="pb-1 pt-1 h-72 text-gray-500 whitespace-pre-wrap">
-                                            {item.text}
+                                            {text}
                                         </p>
                                     </div>
                                 }

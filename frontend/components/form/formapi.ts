@@ -1,14 +1,11 @@
-import { ApiInput, UserForm } from "../type";
-const URL = process.env.NEXT_PUBLIC_BACKEND_URL
+import { ApiInput } from "../type";
 
-
-export async function getPresignedUrl(file: File) {
+export async function getPresignedUrl(file: File, id: string) {
     try {
         const data:ApiInput = {
-            "uniqueId":"test",
             "filename": file.name
         }
-        const response = await fetch(URL + '/api/create-upload-token', {
+        const response = await fetch('api/form/retrieve-image-token', {
             method: 'POST',
             body: JSON.stringify(data),
         });
@@ -27,7 +24,7 @@ export async function uploadData(filename: string){
             "filename": filename
         }
         
-        const response = await fetch(URL + '/api/upload-image', {
+        const response = await fetch('api/form/post-image', {
             method: 'POST',
             body: JSON.stringify(data)
         });

@@ -66,6 +66,7 @@ export const authOptions: any = {
         async session({ session , user }:any) {
             // Send properties to the client, like an access_token and user id from a provider.
             
+            session.id = user.id
             session.credits = user.credits
 
             return session
