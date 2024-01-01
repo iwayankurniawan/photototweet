@@ -27,28 +27,22 @@ export default function Result() {
         if (!session) {
             router.replace('/');
         }
+
+        fetchData()
     }, []);
 
-    const fetchData = useCallback(async () => {
+    async function fetchData(){
         const val = await getResult();
-        if(result){
-            setResult((prevData:any) => [...prevData, ...val]);
-        }else{
+        if (result) {
+            setResult((prevData: any) => [...prevData, ...val]);
+        } else {
             setResult(val);
         }
-        
-        //setResult(val);
-    }, []); // Empty dependency array to memoize the function
+    }
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]); // Only re-run effect if fetchData function changes
-
-    const memoizedResult = useMemo(() => result, [result]); // Memoize the result
-
-    async function test(){
-        const val = await getResult(result[result.length -1].filename);
-        setResult((prevData:any) => [...prevData, ...val]);
+    async function loadMore() {
+        const val = await getResult(result[result.length - 1].filename);
+        setResult((prevData: any) => [...prevData, ...val]);
     }
 
 
@@ -84,7 +78,7 @@ export default function Result() {
                                             <SectionTitle title="Result">
                                                 Explore the outcome of your image through our advanced content generation process displayed below.
                                             </SectionTitle>
-                                            <div className='flex overflow-x-auto w-full'>
+                                            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
                                                 {
                                                     result.map((item: any) =>
                                                         <FormResult imgSrc={item.url} fileName={updateFileName(item.filename)} text={item.result} date={format(item.datetime, "MMMM d, yyyy h:mm:ss a")} key={uuidv4()} >
@@ -95,7 +89,16 @@ export default function Result() {
                                                     )
                                                 }
                                             </div>
-                                            {result[result.length -1].LastEvaluatedKey && <button onClick={() => test()}>loadMore</button>}
+                                            {result[result.length - 1].LastEvaluatedKey &&
+                                                <div className='flex m-4  items-center justify-center text-center'>
+                                                    <button
+                                                        className="inline-block rounded border border-current px-8 py-3 text-sm font-medium text-indigo-600 transition hover:scale-110 hover:shadow-xl focus:outline-none focus:ring active:text-indigo-500"
+                                                        onClick={() => loadMore()}>
+                                                        loadMore
+                                                    </button>
+                                                </div>
+                                            }
+
                                         </>
                                     }
                                 </div>
@@ -113,10 +116,10 @@ export default function Result() {
 
 async function getResult(filename?: string) {
     try {
-        const data:ApiInput = {
+        const data: ApiInput = {
             "filename": filename || ""
         }
-        
+
         const response = await fetch('/api/form/result-image', {
             method: 'POST',
             body: JSON.stringify(data)

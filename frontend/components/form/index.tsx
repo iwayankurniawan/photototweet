@@ -70,7 +70,7 @@ const AddDataForm: React.FC<{
                             <LoadingSpinner />
                             :
                             <>
-                                <div className='flex overflow-x-auto w-full'>
+                                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
                                     {
                                         formData.image.map((item, index) => (
                                             <FormResult imgSrc={URL.createObjectURL(item as File)} fileName={item.name} key={uuidv4()}>

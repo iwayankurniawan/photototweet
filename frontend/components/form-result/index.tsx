@@ -12,8 +12,8 @@ const FormResult: React.FC<{
 }) => {
         return (
             <>
-                <div className='px-1 py-4 sm:px-2 lg:px-2'>
-                    <div className="w-[22rem] rounded-lg shadow transition hover:shadow-lg flex flex-col">
+                
+                    <div className="rounded-lg shadow transition hover:shadow-lg flex flex-col">
                         <div className="w-full h-52 overflow-hidden">
                             <img
                                 src={imgSrc}
@@ -44,7 +44,7 @@ const FormResult: React.FC<{
                             {children}
                         </div>
                     </div>
-                </div>
+                
             </>
         );
     };
