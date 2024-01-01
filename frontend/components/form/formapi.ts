@@ -1,6 +1,6 @@
 import { ApiInput } from "../type";
 
-export async function getPresignedUrl(file: File, id: string) {
+export async function getPresignedUrl(file: File) {
     try {
         const data:ApiInput = {
             "filename": file.name
