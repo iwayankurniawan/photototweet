@@ -6,12 +6,14 @@ import { DynamoDBAdapter } from "@auth/dynamodb-adapter"
 import GoogleProvider from "next-auth/providers/google";
 
 
+const secret = JSON.parse(process.env.secrets as any) 
+
 const config: DynamoDBClientConfig = {
     credentials: {
-        accessKeyId: process.env.NEXT_AUTH_AWS_ACCESS_KEY as string,
-        secretAccessKey: process.env.NEXT_AUTH_AWS_SECRET_KEY as string,
+        accessKeyId: secret.NEXT_AUTH_AWS_ACCESS_KEY as string,
+        secretAccessKey: secret.NEXT_AUTH_AWS_SECRET_KEY as string,
     },
-    region: process.env.NEXT_AUTH_AWS_REGION,
+    region: secret.NEXT_AUTH_AWS_REGION,
 };
 
 const client = DynamoDBDocument.from(new DynamoDB(config), {
@@ -25,8 +27,8 @@ const client = DynamoDBDocument.from(new DynamoDB(config), {
 export const authOptions: any = {
     providers: [
         GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID as string,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+            clientId: secret.GOOGLE_CLIENT_ID as string,
+            clientSecret: secret.GOOGLE_CLIENT_SECRET as string,
             profile(profile: any): any {
                 // use at your own risk
                 return {
@@ -41,8 +43,8 @@ export const authOptions: any = {
 
         }),
         TwitterProvider({
-            clientId: process.env.TWITTER_CLIENT_ID as string,
-            clientSecret: process.env.TWITTER_CLIENT_SECRET as string,
+            clientId: secret.TWITTER_CLIENT_ID as string,
+            clientSecret: secret.TWITTER_CLIENT_SECRET as string,
             version: "2.0",
             profile(profile: any): any {
                 // use at your own risk

@@ -7,48 +7,15 @@ applications:
             - npm ci
         build:
           commands:
-            - env | grep -e NEXTAUTH_URL=$NEXTAUTH_URL >> .env.production
-            - env | grep -e NEXTAUTH_SECRET=$NEXTAUTH_SECRET >> .env.production
-            - env | grep -e NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL >> .env.production
-            - env | grep -e GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID >> .env.production
-            - env | grep -e GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET >> .env.production
-            - env | grep -e NEXT_AUTH_AWS_ACCESS_KEY=$NEXT_AUTH_AWS_ACCESS_KEY >> .env.production
-            - env | grep -e NEXT_AUTH_AWS_SECRET_KEY=$NEXT_AUTH_AWS_SECRET_KEY >> .env.production
-            - env | grep -e NEXT_AUTH_AWS_REGION=$NEXT_AUTH_AWS_REGION >> .env.production
-            - env | grep -e TWITTER_CLIENT_ID=$TWITTER_CLIENT_ID >> .env.production
-            - env | grep -e TWITTER_CLIENT_SECRET=$TWITTER_CLIENT_SECRET >> .env.production
-            - npm run build
-      artifacts:
-        baseDirectory: .next
-        files:
-          - '**/*'
-      cache:
-        paths:
-          - node_modules/**/*
-          - .next/cache/**/*
-    appRoot: frontend
-
-
-version: 1
-applications:
-  - frontend:
-      phases:
-        preBuild:
-          commands:
-            - npm ci
-        build:
-          commands:
             - yum install jq -y
-            - echo "KEY1=$(echo "$NEXTAUTH_URL" | jq -r '.NEXTAUTH_URL')" > .env.production
-            - echo "KEY1=$(echo "$NEXTAUTH_SECRET" | jq -r '.NEXTAUTH_SECRET')" > .env.production
-            - echo "KEY1=$(echo "$NEXT_PUBLIC_BACKEND_URL" | jq -r '.NEXT_PUBLIC_BACKEND_URL')" > .env.production
-            - echo "KEY1=$(echo "$GOOGLE_CLIENT_ID" | jq -r '.GOOGLE_CLIENT_ID')" > .env.production
-            - echo "KEY1=$(echo "$GOOGLE_CLIENT_SECRET" | jq -r '.GOOGLE_CLIENT_SECRET')" > .env.production
-            - echo "KEY1=$(echo "$NEXT_AUTH_AWS_ACCESS_KEY" | jq -r '.NEXT_AUTH_AWS_ACCESS_KEY')" > .env.production
-            - echo "KEY1=$(echo "$NEXT_AUTH_AWS_SECRET_KEY" | jq -r '.NEXT_AUTH_AWS_SECRET_KEY')" > .env.production
-            - echo "KEY1=$(echo "$NEXT_AUTH_AWS_REGION" | jq -r '.NEXT_AUTH_AWS_REGION')" > .env.production
-            - echo "KEY1=$(echo "$TWITTER_CLIENT_ID" | jq -r '.TWITTER_CLIENT_ID')" > .env.production
-            - echo "KEY1=$(echo "$TWITTER_CLIENT_SECRET" | jq -r '.TWITTER_CLIENT_SECRET')" > .env.production
+            - echo "GOOGLE_CLIENT_ID=$(echo "$secrets" | jq -r '.GOOGLE_CLIENT_ID')" >> .env.production
+            - echo "GOOGLE_CLIENT_SECRET=$(echo "$secrets" | jq -r '.GOOGLE_CLIENT_SECRET')" >> .env.production
+            - echo "NEXT_PUBLIC_BACKEND_URL=$(echo "$secrets" | jq -r '.NEXT_PUBLIC_BACKEND_URL')" >> .env.production
+            - echo "NEXT_AUTH_AWS_ACCESS_KEY=$(echo "$secrets" | jq -r '.NEXT_AUTH_AWS_ACCESS_KEY')" >> .env.production
+            - echo "NEXT_AUTH_AWS_SECRET_KEY=$(echo "$secrets" | jq -r '.NEXT_AUTH_AWS_SECRET_KEY')" >> .env.production
+            - echo "NEXT_AUTH_AWS_REGION=$(echo "$secrets" | jq -r '.NEXT_AUTH_AWS_REGION')" >> .env.production
+            - echo "TWITTER_CLIENT_ID=$(echo "$secrets" | jq -r '.TWITTER_CLIENT_ID')" >> .env.production
+            - echo "TWITTER_CLIENT_SECRET=$(echo "$secrets" | jq -r '.TWITTER_CLIENT_SECRET')" >> .env.production
             - npm run build
       artifacts:
         baseDirectory: .next
