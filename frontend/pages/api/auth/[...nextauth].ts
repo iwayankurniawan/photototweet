@@ -4,9 +4,13 @@ import NextAuth from "next-auth";
 import TwitterProvider from "next-auth/providers/twitter";
 import { DynamoDBAdapter } from "@auth/dynamodb-adapter"
 import GoogleProvider from "next-auth/providers/google";
+console.log("process.env.secrets")
 console.log(process.env.secrets)
+console.log("----------------------------------------")
+console.log(typeof process.env.secrets)
+console.log("process.env")
 console.log(process.env)
-const secret = JSON.parse(process.env.secrets as any) 
+const secret = process.env.secrets as any
 
 const config: DynamoDBClientConfig = {
     credentials: {
