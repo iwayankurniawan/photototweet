@@ -3,7 +3,8 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { ApiInput } from '@/components/type'
 import { type } from 'os'
-const URL = JSON.parse(process.env.secret as any).NEXT_PUBLIC_BACKEND_URL
+
+const URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     const session: any = await getServerSession(req, res, authOptions)

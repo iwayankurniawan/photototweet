@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { ApiInput } from '@/components/type'
-const URL = JSON.parse(process.env.secret as any).NEXT_PUBLIC_BACKEND_URL
+const URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     const session:any = await getServerSession(req, res, authOptions)
