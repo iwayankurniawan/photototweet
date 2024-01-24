@@ -22,7 +22,6 @@ def lambda_handler(event, context):
             ExpiresIn=60,
         )
         
-        print(presigned_url)
         # Return the presigned URL
         return {
             "statusCode": 200,

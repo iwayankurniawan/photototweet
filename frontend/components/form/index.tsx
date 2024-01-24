@@ -16,7 +16,6 @@ const AddDataForm: React.FC<{
 
 }) => {
         const [formData, setFormData] = useState<UserForm>({ image: [] })
-        const [result, setResult] = useState<ResultViewType[]>([])
         const [showLoading, setShowLoading] = useState<boolean>(false)
         const fileInputRef = useRef<HTMLInputElement>(null);
         const router = useRouter();
@@ -41,22 +40,9 @@ const AddDataForm: React.FC<{
             setFormData({ image: [] })
 
             const filenameList = await sendMultipleRequests(sendFormData)
-
-            const promises = filenameList?.map((item_name: string) => uploadData(item_name));
-            if (promises) {
-                const results = await Promise.all(promises);
-                setShowLoading(false)
-
-                const combinedArray: ResultViewType[] = results.map((item) => {
-                    const matchingFilename = Array.from(sendFormData).find(filename => item?.filename.includes(filename.name));
-                    return {
-                        text: item?.text as string,
-                        file: matchingFilename as File
-                    };
-                })
-
-                setResult(combinedArray)
-            }
+            
+            await uploadData(filenameList as string[])
+            setShowLoading(false)
            
             router.push('/result');
             //reset()

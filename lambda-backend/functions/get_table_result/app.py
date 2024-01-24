@@ -5,6 +5,7 @@ import json
 import os
 import traceback
 import uuid
+from datetime import datetime
 
 
 def lambda_handler(event, context):
@@ -22,7 +23,8 @@ def lambda_handler(event, context):
             sort_key_value = None
         
         result,LastEvaluatedKey = query_dynamodb_with_paging(
-            table_name=table_name, partition_key_value=partition_key_value, sort_key_value=sort_key_value)
+            table_name=table_name, partition_key_value=partition_key_value, sort_key_value=sort_key_value
+        )
         
         for item in result:
             item["url"] = create_presigned(item["user_id"]+"/"+item["filename"])
@@ -52,41 +54,44 @@ def lambda_handler(event, context):
         }
 
 
-def query_dynamodb_with_paging(table_name, partition_key_value, sort_key_value=None, page_size=3):
+def query_dynamodb_with_paging(table_name, partition_key_value, sort_key_value=None, page_size=10):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
-
+    
     if sort_key_value:
         exclusive_start_key = {
             'id': partition_key_value,
             'filename': sort_key_value,
         }
-        # Use the query operation to get items based on the partition key and sort key
-        response = table.query(
-            KeyConditionExpression='#partition_key = :partition_value',
-            ExpressionAttributeNames={
-                '#partition_key': 'id',
-            },
-            ExpressionAttributeValues={
-                ':partition_value': partition_key_value,
-            },
-            Limit=page_size,
-            ExclusiveStartKey=exclusive_start_key
-        )
-    else:
         
         # Use the query operation to get items based on the partition key and sort key
         response = table.query(
-            KeyConditionExpression='#partition_key = :partition_value',
+            IndexName='datetime-index',  # Specify the name of your datetime index
+            KeyConditionExpression='id = :partition_key',  # Specify the partition key
+            ExpressionAttributeValues={
+                ':partition_key': partition_key_value,  # Replace with the actual partition key value
+            },
+            ScanIndexForward=False,  # Set to False for descending order (newest to oldest)
+            ExclusiveStartKey=exclusive_start_key,
+            Limit=page_size  
+        )
+    else:
+        # Use the query operation to get items based on the partition key and sort key
+        response = table.query(
+            IndexName="GSI_Datetime",
+            KeyConditionExpression='#id = :partition_value AND #datetime < :thedate', 
             ExpressionAttributeNames={
-                '#partition_key': 'id',
+                '#id': 'id',
+                '#datetime': 'datetime'
             },
             ExpressionAttributeValues={
                 ':partition_value': partition_key_value,
+                ':thedate': datetime.utcnow().isoformat()
             },
-            Limit=page_size
+            Limit=page_size,
+            ScanIndexForward=False
         )
-    print(response)
+    
     # Display the items
     items = response.get('Items', [])
     if 'LastEvaluatedKey' in response:

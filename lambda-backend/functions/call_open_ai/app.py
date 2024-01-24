@@ -12,7 +12,6 @@ import traceback
 
 def lambda_handler(event, context):
     try:
-        print(event)
         secret = get_secret()
         # Setup openai client
         secret_val = json.loads(secret)
@@ -22,17 +21,45 @@ def lambda_handler(event, context):
         s3 = boto3.client('s3')
         bucket_name = os.environ["S3_STORAGE"]
 
-        # get information from user
-        event_body = json.loads(event["body"])
-        filename = event_body["filename"]
-        user_id = event_body["uniqueId"]
-        s3_folder = user_id + "/" + filename
+        for record in event['Records']:
+            # get information from user
+            event_body = json.loads(record['body'])
+            filename = event_body["filename"]
+            user_id = event_body["uniqueId"]
+            s3_folder = user_id + "/" + filename
 
-        # Main Function start in here
-        base64_image = get_s3_image_as_base64(s3, bucket_name, s3_folder)
-        result_vision = openai_vision(openai_client, base64_image)
-        result = openai_gpt(openai_client, result_vision)
+            # Main Function start in here
+            base64_image = get_s3_image_as_base64(s3, bucket_name, s3_folder)
+            result_vision = openai_vision(openai_client, base64_image)
+            result = openai_gpt(openai_client, result_vision)
 
+            client = boto3.resource("dynamodb")
+            image_table = client.Table(os.environ["DYNAMODB_IMAGE_TABLE"])
+            timestamp = datetime.utcnow().isoformat()
+            image_table.put_item(Item={
+                'id': "USER#" + user_id,
+                'user_id': user_id,
+                'filename': filename,  
+                'datetime': timestamp,
+                'result': result,
+                'status': "Image Done"
+                # Add other attributes as needed
+            })
+
+            # Return chat completion url
+            return {
+                "statusCode": 200,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Headers": "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST",
+                },
+                "body": json.dumps({"result": result}),
+            }
+    except Exception as error:
+        print(error)
+        traceback.print_exc()
         client = boto3.resource("dynamodb")
         image_table = client.Table(os.environ["DYNAMODB_IMAGE_TABLE"])
         timestamp = datetime.utcnow().isoformat()
@@ -41,24 +68,11 @@ def lambda_handler(event, context):
             'user_id': user_id,
             'filename': filename,  
             'datetime': timestamp,
-            'result': result
+            'status': "Image Failed"
             # Add other attributes as needed
         })
-
-        # Return chat completion url
-        return {
-            "statusCode": 200,
-            "headers": {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Headers": "Content-Type",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "OPTIONS,POST",
-            },
-            "body": json.dumps({"result": result}),
-        }
-    except Exception as error:
-        print(error)
-        traceback.print_exc()
+        #Update the credits, so it return to correct value
+        updateDynamoDbCredits(user_id)
         return {
             "statusCode": 500,
             "headers": {
@@ -93,7 +107,6 @@ def openai_vision(client, base64_image):
     )
     return response.choices[0].message.content
 
-
 def openai_gpt(client, question):
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
@@ -103,7 +116,6 @@ def openai_gpt(client, question):
         ],
     )
     return response.choices[0].message.content
-
 
 def get_s3_image_as_base64(s3, bucket_name, key):
     try:
@@ -120,7 +132,6 @@ def get_s3_image_as_base64(s3, bucket_name, key):
         print(f"Error: {e}")
         return None
 
-
 def get_secret():
     # Create a Secrets Manager client
     session = boto3.session.Session()
@@ -136,3 +147,40 @@ def get_secret():
         raise e
     secret = get_secret_value_response['SecretString']
     return secret
+
+def updateDynamoDbCredits(user_id):
+    # Create a DynamoDB resource
+    dynamodb = boto3.resource('dynamodb')
+
+    # Specify the table name
+    table_name = os.environ["NEXT_AUTH_TABLE"]
+
+    # Specify the key of the item you want to update
+    item_key = {'pk': "USER#" + user_id, 'sk' : "USER#" + user_id}
+
+    # Specify the attribute you want to update (e.g., 'credits')
+    attribute_to_update = 'credits'
+
+    response = table.get_item(Key=item_key)
+    current_value = response.get('Item', {}).get('credits', 0)
+    print("current_value "+response)
+    # Specify the increment value
+    increment_value = 1
+
+    # Create the DynamoDB table resource
+    table = dynamodb.Table(table_name)
+
+    # Update the item using the UpdateItem operation
+    response = table.update_item(
+        Key=item_key,
+        UpdateExpression=f"SET {attribute_to_update} = :new_value",
+        condition_expression = f"{attribute_to_update} = :expected_value",
+        ExpressionAttributeValues={
+            ':new_value': current_value + increment_value,
+            ':expected_value': current_value,
+        },
+        ReturnValues='UPDATED_NEW'
+    )
+
+    # Print the updated item
+    print("Updated Item:", response['Attributes'])

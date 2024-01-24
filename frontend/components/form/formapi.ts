@@ -18,7 +18,7 @@ export async function getPresignedUrl(file: File) {
     }
 }
 
-export async function uploadData(filename: string){
+export async function uploadData(filename: string[]){
     try {
         const data:ApiInput = {
             "filename": filename

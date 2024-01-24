@@ -24,6 +24,7 @@ export default function Result() {
     const router = useRouter();
 
     useEffect(() => {
+        console.log(session)
         if (!session) {
             router.replace('/');
         }
@@ -126,7 +127,7 @@ async function getResult(filename?: string) {
         });
 
         const result = await response.json();
-        console.log(result)
+        
         return result.result
     } catch (error) {
         console.error('Error posting data:', error);

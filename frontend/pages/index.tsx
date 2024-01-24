@@ -9,7 +9,7 @@ import Faq from '@/components/home/faq';
 
 const Home: NextPage = () => {
   const { status } = useSession()
-  console.log(process.env.secrets)
+  
   if (status === 'loading') {
     return (
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
@@ -38,8 +38,6 @@ const Home: NextPage = () => {
         <div className='mx-10'>
           <Faq />
         </div>
-
-        <Footer />
       </>
     )
   }
