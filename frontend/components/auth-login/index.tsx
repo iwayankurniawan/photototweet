@@ -22,7 +22,7 @@ export function LoginButton() {
                             <div className="font-medium truncate">{session.user?.email}</div>
                         </div>
                         <div className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                            <div>Images Quota:</div>
+                            <div>Images Credits:</div>
                             <div className="font-medium truncate">{(session as any).credits}</div>
                         </div>
                         <div className="py-2">

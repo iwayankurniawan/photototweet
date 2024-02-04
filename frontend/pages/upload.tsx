@@ -7,15 +7,19 @@ import Navbar from '@/components/home/navbar'
 import LoadingSpinner from '@/components/loading-spinner'
 import ErrorMessage from '@/components/error-message'
 import { useEffect } from 'react';
+import CheckoutButton from '@/components/stripe/checkout';
+import CheckoutForm from '@/components/stripe/checkoutForm';
 
 export default function Upload() {
   const { data: session, status } = useSession()
   const router = useRouter();
 
   useEffect(() => {
+    /*
     if (!session) {
       router.replace('/');
     }
+    */
   }, []);
 
   if (status === 'loading') {
@@ -45,7 +49,8 @@ export default function Upload() {
                 <SectionTitle title="Upload Your Photo">
                   Enhance your experience by uploading your photo here, allowing us to generate tailored and optimized text that seamlessly complements your image
                 </SectionTitle>
-                <AddDataForm />
+                <CheckoutForm />
+                <AddDataForm/>
               </div>
             </div>
             :

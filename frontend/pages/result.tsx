@@ -21,24 +21,26 @@ import { te } from 'date-fns/locale.mjs';
 export default function Result() {
     const { data: session, status } = useSession()
     const [result, setResult] = useState<any>()
+    const [loadData, setLoadData] = useState<boolean>(false)
     const router = useRouter();
 
     useEffect(() => {
-        console.log(session)
-        if (!session) {
-            router.replace('/');
-        }
-
         fetchData()
     }, []);
 
-    async function fetchData(){
+    useEffect(() => {
+        console.log(status)
+    }, [status]);
+
+    async function fetchData() {
+        setLoadData(true)
         const val = await getResult();
         if (result) {
             setResult((prevData: any) => [...prevData, ...val]);
         } else {
             setResult(val);
         }
+        setLoadData(false)
     }
 
     async function loadMore() {
@@ -47,11 +49,8 @@ export default function Result() {
     }
 
 
-    if (status === 'loading') {
-        return (
-            <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
-                <LoadingSpinner />
-            </div>)
+    if (status === "unauthenticated") {
+        router.replace('/');
     } else {
         return (
             <>
@@ -72,35 +71,43 @@ export default function Result() {
                         <div className='bg-gray-100'>
                             <div className='mx-10'>
                                 <div className='flex flex-col'>
+                                    <SectionTitle title="Result">
+                                        Explore the outcome of your image through our advanced content generation process displayed below.
+                                    </SectionTitle>
                                     {
-                                        result &&
-                                        result.length !== 0 &&
-                                        <>
-                                            <SectionTitle title="Result">
-                                                Explore the outcome of your image through our advanced content generation process displayed below.
-                                            </SectionTitle>
-                                            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
-                                                {
-                                                    result.map((item: any) =>
-                                                        <FormResult imgSrc={item.url} fileName={updateFileName(item.filename)} text={item.result} date={format(item.datetime, "MMMM d, yyyy h:mm:ss a")} key={uuidv4()} >
-                                                            <div key={uuidv4()} className='flex justify-end mt-2'>
-                                                                <CopyToClipboardButton textToCopy={item.text as string} key={uuidv4()} />
-                                                            </div>
-                                                        </FormResult>
-                                                    )
-                                                }
-                                            </div>
-                                            {result[result.length - 1].LastEvaluatedKey &&
-                                                <div className='flex m-4  items-center justify-center text-center'>
-                                                    <button
-                                                        className="inline-block rounded border border-current px-8 py-3 text-sm font-medium text-indigo-600 transition hover:scale-110 hover:shadow-xl focus:outline-none focus:ring active:text-indigo-500"
-                                                        onClick={() => loadMore()}>
-                                                        loadMore
-                                                    </button>
-                                                </div>
-                                            }
+                                        loadData ?
+                                            <div className='mb-4'>
+                                                <LoadingSpinner />
+                                            </div> 
+                                            
+                                            :
+                                            
+                                            (result && result.length !== 0 && !loadData) ?
+                                                <>
+                                                    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
+                                                        {
+                                                            result.map((item: any) =>
+                                                                <FormResult imgSrc={item.url} fileName={updateFileName(item.filename)} text={item.result} date={format(item.datetime, "MMMM d, yyyy h:mm:ss a")} key={uuidv4()} >
+                                                                    <div key={uuidv4()} className='flex justify-end mt-2'>
+                                                                        <CopyToClipboardButton textToCopy={item.text as string} key={uuidv4()} />
+                                                                    </div>
+                                                                </FormResult>
+                                                            )
+                                                        }
+                                                    </div>
+                                                    {result[result.length - 1].LastEvaluatedKey &&
+                                                        <div className='flex m-4  items-center justify-center text-center'>
+                                                            <button
+                                                                className="inline-block rounded border border-current px-8 py-3 text-sm font-medium text-indigo-600 transition hover:scale-110 hover:shadow-xl focus:outline-none focus:ring active:text-indigo-500"
+                                                                onClick={() => loadMore()}>
+                                                                loadMore
+                                                            </button>
+                                                        </div>
+                                                    }
 
-                                        </>
+                                                </>
+                                                :
+                                                <p>No Result</p>
                                     }
                                 </div>
                             </div>
@@ -112,6 +119,7 @@ export default function Result() {
             </>
         )
     }
+
 }
 
 
@@ -127,7 +135,7 @@ async function getResult(filename?: string) {
         });
 
         const result = await response.json();
-        
+
         return result.result
     } catch (error) {
         console.error('Error posting data:', error);

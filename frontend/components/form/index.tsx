@@ -7,19 +7,23 @@ import FormResult from '../form-result';
 import { v4 as uuidv4 } from 'uuid';
 import FormImageInput from '../form-image-input';
 import LoadingSpinner from '../loading-spinner';
-import SectionTitle from "../home/sectionTitle";
-import CopyToClipboardButton from '../form-copy-to-clipboard';
+import { Session } from 'next-auth';
+import { useSession } from 'next-auth/react';
+import FailedNotifications from '../fail-notifications';
 
 const AddDataForm: React.FC<{
-
+    
 }> = ({
-
+    
 }) => {
         const [formData, setFormData] = useState<UserForm>({ image: [] })
         const [showLoading, setShowLoading] = useState<boolean>(false)
+        const [fail, setFail] = useState<boolean>(false)
         const fileInputRef = useRef<HTMLInputElement>(null);
+        const { data: session } = useSession()
         const router = useRouter();
-
+        let timeoutDuration = 7000
+        
         const removeItem = (indexToRemove: number) => {
             setFormData((prevListUpload: UserForm) => {
                 const updatedItems = [...prevListUpload.image.slice(0, indexToRemove), ...prevListUpload.image.slice(indexToRemove + 1)];
@@ -34,22 +38,42 @@ const AddDataForm: React.FC<{
             }
         }
 
-        const onSubmit = async (data: UserForm) => {
-            setShowLoading(true)
-            const sendFormData = [...data.image]
-            setFormData({ image: [] })
+        useEffect(() => {
+            let timeout: NodeJS.Timeout;
+    
+            if (fail) {
+                timeout = setTimeout(() => {
+                    setFail(false);
+                }, timeoutDuration);
+            }
+    
+            return () => {
+                clearTimeout(timeout);
+            };
+        }, [fail]);
 
-            const filenameList = await sendMultipleRequests(sendFormData)
+        const onSubmit = async (data: UserForm) => {
+            if ((session as any).credits <  data.image.length){
+                setFail(true)
+            }else{
+                setShowLoading(true)
+                const sendFormData = [...data.image]
+                setFormData({ image: [] })
+
+                const filenameList = await sendMultipleRequests(sendFormData)
+                
+                await uploadData(filenameList as string[])
+                setShowLoading(false)
             
-            await uploadData(filenameList as string[])
-            setShowLoading(false)
-           
-            router.push('/result');
-            //reset()
+                router.push('/result');
+                //reset()
+            }
+            
         };
 
         return (
             <>
+                {true && <FailedNotifications firstMessage={"Error"} secondMessage={`Number of Credits is not enough, you only have ${(session as any).credits} credits left, but you want to upload ${formData.image.length} images`} timeoutDuration={timeoutDuration} />}
                 <div className="mx-auto">
                     <div className='bg-gray-200 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8'>
                         {showLoading ?
