@@ -7,10 +7,9 @@ import Footer from '@/components/home/footer';
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <SessionProvider session={session}>
+      <Navbar />
       <Component {...pageProps} />
-      <div className='mx-10'>
-        <Footer />
-      </div>
+      <Footer />
     </SessionProvider>
   );
 }

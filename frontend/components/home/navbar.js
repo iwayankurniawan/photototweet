@@ -11,19 +11,16 @@ const Navbar = () => {
 
   return (
     <div className="w-full">
-      <nav className="container relative flex flex-wrap items-center justify-between p-8 mx-auto lg:justify-between xl:px-0">
+      <nav className="container relative flex flex-wrap items-center justify-between p-8 mx-auto xl:px-0">
         {/* Logo  */}
-        <>
-          <div className="flex flex-wrap items-center justify-between w-full lg:w-auto">
-            <Link href="/">
-              <div className="text-black flex items-center justify-center">
-                <p className="text-2xl font-bold tracking-wide">PicToContent</p>
-              </div>
-            </Link>
-          </div>
-        </>
 
-
+        <div className="flex flex-wrap items-center justify-between w-auto">
+          <Link href="/">
+            <div className="text-black flex items-center justify-center">
+              <p className="text-2xl font-bold tracking-wide">PicToContent</p>
+            </div>
+          </Link>
+        </div>
 
         {/* menu  */}
         <div className="hidden text-center lg:flex lg:items-center">
@@ -52,7 +49,8 @@ const Navbar = () => {
           </ul>
         </div>
 
-        <div className="hidden mr-3 space-x-4 lg:flex nav__item">
+      
+        <div className="mr-3 space-x-4 nav__item">
           <LoginButton />
         </div>
 

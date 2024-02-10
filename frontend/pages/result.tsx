@@ -62,9 +62,7 @@ export default function Result() {
                     />
                     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico" />
                 </Head>
-                <div className='mx-10'>
-                    <Navbar />
-                </div>
+                
                 {
                     session
                         ?

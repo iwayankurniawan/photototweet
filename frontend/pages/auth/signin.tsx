@@ -27,9 +27,7 @@ export default function SignIn({
                 />
                 <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico" />
             </Head>
-            <div className='mx-10'>
-                <Navbar />
-            </div>
+           
             <div className="grid h-screen w-screen place-items-center shadow px-4 text-sm font-medium">
                 <div className="w-full max-w-sm rounded-lg shadow-2xl">
                     <div className="text-black py-3 flex items-center justify-center flex flex-col">

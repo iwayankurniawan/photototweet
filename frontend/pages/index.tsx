@@ -5,7 +5,7 @@ import Head from 'next/head'
 import { useSession } from 'next-auth/react';
 import LoadingSpinner from '@/components/loading-spinner';
 import Navbar from '@/components/home/navbar';
-import Faq from '@/components/home/faq';
+import FaqSection from '@/components/faq-section';
 
 const Home: NextPage = () => {
   const { status } = useSession()
@@ -26,18 +26,8 @@ const Home: NextPage = () => {
           />
           <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico" />
         </Head>
-        
-        <div className='mx-10'>
-          <Navbar />
-        </div> 
-
-        <div className='mx-10'>
-          <Hero />
-        </div>
-
-        <div className='mx-10'>
-          <Faq />
-        </div>
+        <Hero />
+        <FaqSection/>
       </>
     )
   }

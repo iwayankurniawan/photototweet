@@ -7,7 +7,6 @@ import Navbar from '@/components/home/navbar'
 import LoadingSpinner from '@/components/loading-spinner'
 import ErrorMessage from '@/components/error-message'
 import { useEffect } from 'react';
-import CheckoutButton from '@/components/stripe/checkout';
 import CheckoutForm from '@/components/stripe/checkoutForm';
 
 export default function Upload() {
@@ -38,9 +37,7 @@ export default function Upload() {
           />
           <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico" />
         </Head>
-        <div className='mx-10'>
-          <Navbar />
-        </div>
+        
         {
           session
             ?

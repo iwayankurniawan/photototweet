@@ -35,22 +35,22 @@ const Faq = () => {
 
 const faqdata = [
   {
-    question: "Is this template completely free to use?",
-    answer: "Yes, this template is completely free to use.",
+    question: "Is this application completely free to use?",
+    answer: "Yes, you can upload 5 images for free, after that you need to buy credits to upload more images",
   },
   {
-    question: "Can I use it in a commercial project?",
-    answer: "Yes, this you can.",
+    question: "How many images you can upload for each generation?",
+    answer: "You can upload max 5 images, for each generation",
   },
   {
-    question: "What is your refund policy? ",
+    question: "Is there a limit size for each images?",
     answer:
-      "If you're unhappy with your purchase for any reason, email us within 90 days and we'll refund you in full, no questions asked.",
+      "Yes, please upload files with a size of up to 5 MB.",
   },
   {
-    question: "Do you offer technical support? ",
+    question: "How I can register to use this application?",
     answer:
-      "No, we don't offer technical support for free downloads. Please purchase a support plan to get 6 months of support.",
+      "You can register using your existing gmail and twitter account",
   },
 ];
 

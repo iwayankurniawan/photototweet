@@ -73,7 +73,7 @@ const AddDataForm: React.FC<{
 
         return (
             <>
-                {true && <FailedNotifications firstMessage={"Error"} secondMessage={`Number of Credits is not enough, you only have ${(session as any).credits} credits left, but you want to upload ${formData.image.length} images`} timeoutDuration={timeoutDuration} />}
+                {fail && <FailedNotifications firstMessage={"Error"} secondMessage={`Number of Credits is not enough, you only have ${(session as any).credits} credits left, but you want to upload ${formData.image.length} images`} timeoutDuration={timeoutDuration} />}
                 <div className="mx-auto">
                     <div className='bg-gray-200 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8'>
                         {showLoading ?
