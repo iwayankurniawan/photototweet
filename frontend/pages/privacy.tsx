@@ -15,7 +15,7 @@ export default function Privacy() {
             </Head>
             
             <div className='bg-gray-100'>
-                <div className='mx-10 pb-8'>
+                <div className='pb-8'>
                     <SectionTitle title="PicToContent Privacy" />
                     <div className="flex justify-center items-center">
                         <div className="text-left w-9/12 xl:w-1/2">

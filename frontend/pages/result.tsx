@@ -51,6 +51,9 @@ export default function Result() {
 
     if (status === "unauthenticated") {
         router.replace('/');
+        return (
+            <ErrorMessage />
+        )
     } else {
         return (
             <>
@@ -62,58 +65,53 @@ export default function Result() {
                     />
                     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico" />
                 </Head>
-                
-                {
-                    session
-                        ?
-                        <div className='bg-gray-100'>
-                            <div className='mx-10'>
-                                <div className='flex flex-col'>
-                                    <SectionTitle title="Result">
-                                        Explore the outcome of your image through our advanced content generation process displayed below.
-                                    </SectionTitle>
-                                    {
-                                        loadData ?
-                                            <div className='mb-4'>
-                                                <LoadingSpinner />
-                                            </div> 
-                                            
-                                            :
-                                            
-                                            (result && result.length !== 0 && !loadData) ?
-                                                <>
-                                                    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
-                                                        {
-                                                            result.map((item: any) =>
-                                                                <FormResult imgSrc={item.url} fileName={updateFileName(item.filename)} text={item.result} date={format(item.datetime, "MMMM d, yyyy h:mm:ss a")} key={uuidv4()} >
-                                                                    <div key={uuidv4()} className='flex justify-end mt-2'>
-                                                                        <CopyToClipboardButton textToCopy={item.text as string} key={uuidv4()} />
-                                                                    </div>
-                                                                </FormResult>
-                                                            )
-                                                        }
-                                                    </div>
-                                                    {result[result.length - 1].LastEvaluatedKey &&
-                                                        <div className='flex m-4  items-center justify-center text-center'>
-                                                            <button
-                                                                className="inline-block rounded border border-current px-8 py-3 text-sm font-medium text-indigo-600 transition hover:scale-110 hover:shadow-xl focus:outline-none focus:ring active:text-indigo-500"
-                                                                onClick={() => loadMore()}>
-                                                                loadMore
-                                                            </button>
-                                                        </div>
-                                                    }
 
-                                                </>
-                                                :
-                                                <p>No Result</p>
-                                    }
-                                </div>
+                {
+                    <div className='bg-gray-100'>
+                        <div className='mx-0 md:mx-4 lg:mx-8'>
+                            <div className='flex flex-col'>
+                                <SectionTitle title="Result">
+                                    Explore the outcome of your image through our advanced content generation process displayed below.
+                                </SectionTitle>
+                                {
+                                    loadData ?
+                                        <div className='mb-4'>
+                                            <LoadingSpinner />
+                                        </div>
+
+                                        :
+
+                                        (result && result.length !== 0 && !loadData) ?
+                                            <>
+                                                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
+                                                    {
+                                                        result.map((item: any) =>
+                                                            <FormResult imgSrc={item.url} fileName={updateFileName(item.filename)} text={item.result} date={format(item.datetime, "MMMM d, yyyy h:mm:ss a")} key={uuidv4()} >
+                                                                <div key={uuidv4()} className='flex justify-end mt-2'>
+                                                                    <CopyToClipboardButton textToCopy={item.text as string} key={uuidv4()} />
+                                                                </div>
+                                                            </FormResult>
+                                                        )
+                                                    }
+                                                </div>
+                                                {result[result.length - 1].LastEvaluatedKey &&
+                                                    <div className='flex m-4  items-center justify-center text-center'>
+                                                        <button
+                                                            className="inline-block rounded border border-current px-8 py-3 text-sm font-medium text-indigo-600 transition hover:scale-110 hover:shadow-xl focus:outline-none focus:ring active:text-indigo-500"
+                                                            onClick={() => loadMore()}>
+                                                            loadMore
+                                                        </button>
+                                                    </div>
+                                                }
+
+                                            </>
+                                            :
+                                            <p>No Result</p>
+                                }
                             </div>
                         </div>
-                        :
-                        <ErrorMessage />
+                    </div>
                 }
-
             </>
         )
     }

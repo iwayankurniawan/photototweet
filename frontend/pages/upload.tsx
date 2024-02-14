@@ -42,7 +42,7 @@ export default function Upload() {
           session
             ?
             <div className='bg-gray-100'>
-              <div className='mx-10 pb-8'>
+              <div className='mx-5 lg:mx-10 pb-8'>
                 <SectionTitle title="Upload Your Photo">
                   Enhance your experience by uploading your photo here, allowing us to generate tailored and optimized text that seamlessly complements your image
                 </SectionTitle>
